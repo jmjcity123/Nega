@@ -42,7 +42,7 @@ introStroke.Parent = introFrame
 local introText = Instance.new("TextLabel")
 introText.Size = UDim2.new(1, 0, 1, 0)
 introText.BackgroundTransparency = 1
-introText.Text = "67 CLIENT"
+introText.Text = "67 Client"
 introText.TextColor3 = Color3.fromRGB(255, 180, 255)
 introText.TextSize = 20
 introText.Font = Enum.Font.GothamBold
@@ -85,15 +85,16 @@ mainStroke.Color = Color3.fromRGB(220, 120, 240)
 mainStroke.Thickness = 1.5
 mainStroke.Parent = mainFrame
 
+-- Titel oben mittig und größer
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -50, 0, 45)
-titleLabel.Position = UDim2.new(0, 15, 0, 0)
+titleLabel.Size = UDim2.new(1, 0, 0, 45)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "67 CLIENT [Ultimate Edition]"
+titleLabel.Text = "67 Client"
 titleLabel.TextColor3 = Color3.fromRGB(255, 180, 255)
-titleLabel.TextSize = 13
+titleLabel.TextSize = 18
 titleLabel.Font = Enum.Font.GothamBold
-titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.Parent = mainFrame
 
 local openButton = Instance.new("TextButton")
@@ -453,7 +454,7 @@ createToggle(tabs["Main"], "Noclip", 95, function(state)
 end)
 
 -- =====================================================================
--- 4. ESP TAB (Kompakterer 3D-Kopfkreis + Skeleton)
+-- 4. ESP TAB
 -- =====================================================================
 local espBox = false
 local espSnaplines = false
@@ -680,7 +681,6 @@ RunService.RenderStepped:Connect(function()
                             end
                         end
 
-                        -- Kompakterer Kopf-Kreis (auf 0.45 Studs reduziert)
                         if positions.Head then
                             local headPos, headOnScreen = Camera:WorldToViewportPoint(positions.Head)
                             local headTopPos = Camera:WorldToViewportPoint(positions.Head + Vector3.new(0, 0.45, 0))
@@ -834,6 +834,6 @@ end)
 
 StarterGui:SetCore("SendNotification", {
     Title = "67 Client",
-    Text = "Kopfkreis-Größe verkleinert!",
+    Text = "Titel wurde angepasst!",
     Duration = 4
 })
