@@ -1,0 +1,839 @@
+-- =====================================================================
+-- 67 CLIENT (Delta Compatible + Clean Fly + Dynamic Skeleton ESP)
+-- =====================================================================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local GuiService = game:GetService("GuiService")
+local StarterGui = game:GetService("StarterGui")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+if LocalPlayer.PlayerGui:FindFirstChild("Client67") then
+    LocalPlayer.PlayerGui.Client67:Destroy()
+end
+
+-- =====================================================================
+-- 1. INTRO ANIMATION
+-- =====================================================================
+local introGui = Instance.new("ScreenGui")
+introGui.Name = "Client67Intro"
+introGui.ResetOnSpawn = false
+introGui.Parent = LocalPlayer.PlayerGui
+
+local introFrame = Instance.new("Frame")
+introFrame.Size = UDim2.new(0, 0, 0, 70)
+introFrame.Position = UDim2.new(0.5, 0, 0.5, -35)
+introFrame.BackgroundColor3 = Color3.fromRGB(55, 35, 75)
+introFrame.BorderSizePixel = 0
+introFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+introFrame.Parent = introGui
+
+local introCorner = Instance.new("UICorner")
+introCorner.CornerRadius = UDim.new(0, 8)
+introCorner.Parent = introFrame
+
+local introStroke = Instance.new("UIStroke")
+introStroke.Color = Color3.fromRGB(220, 120, 240)
+introStroke.Thickness = 1.5
+introStroke.Parent = introFrame
+
+local introText = Instance.new("TextLabel")
+introText.Size = UDim2.new(1, 0, 1, 0)
+introText.BackgroundTransparency = 1
+introText.Text = "67 CLIENT"
+introText.TextColor3 = Color3.fromRGB(255, 180, 255)
+introText.TextSize = 20
+introText.Font = Enum.Font.GothamBold
+introText.TextTransparency = 1
+introText.Parent = introFrame
+
+local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+TweenService:Create(introFrame, tweenInfo, {Size = UDim2.new(0, 320, 0, 70)}):Play()
+task.wait(0.3)
+TweenService:Create(introText, tweenInfo, {TextTransparency = 0}):Play()
+task.wait(1.8)
+TweenService:Create(introFrame, tweenInfo, {Size = UDim2.new(0, 0, 0, 70)}):Play()
+TweenService:Create(introText, tweenInfo, {TextTransparency = 1}):Play()
+task.wait(0.5)
+introGui:Destroy()
+
+-- =====================================================================
+-- 2. HAUPT-GUI
+-- =====================================================================
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Client67"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = LocalPlayer.PlayerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 420, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -210, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(48, 28, 68)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 8)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(220, 120, 240)
+mainStroke.Thickness = 1.5
+mainStroke.Parent = mainFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -50, 0, 45)
+titleLabel.Position = UDim2.new(0, 15, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "67 CLIENT [Ultimate Edition]"
+titleLabel.TextColor3 = Color3.fromRGB(255, 180, 255)
+titleLabel.TextSize = 13
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = mainFrame
+
+local openButton = Instance.new("TextButton")
+openButton.Size = UDim2.new(0, 56, 0, 56)
+openButton.Position = UDim2.new(1, -66, 0.5, -28)
+openButton.BackgroundColor3 = Color3.fromRGB(48, 28, 68)
+openButton.Text = "67"
+openButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+openButton.TextSize = 16
+openButton.Font = Enum.Font.GothamBold
+openButton.Visible = false
+openButton.Parent = screenGui
+
+local openCorner = Instance.new("UICorner")
+openCorner.CornerRadius = UDim.new(0, 8)
+openCorner.Parent = openButton
+
+local openStroke = Instance.new("UIStroke")
+openStroke.Color = Color3.fromRGB(220, 120, 240)
+openStroke.Thickness = 2
+openStroke.Parent = openButton
+
+local function toggleMenu()
+    mainFrame.Visible = not mainFrame.Visible
+    openButton.Visible = not mainFrame.Visible
+end
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 26, 0, 26)
+closeButton.Position = UDim2.new(1, -34, 0, 10)
+closeButton.BackgroundColor3 = Color3.fromRGB(70, 42, 98)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 180, 255)
+closeButton.TextSize = 12
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = mainFrame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+closeButton.MouseButton1Click:Connect(toggleMenu)
+openButton.MouseButton1Click:Connect(toggleMenu)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.K then
+        toggleMenu()
+    end
+end)
+
+local wasVisibleBeforeEsc = true
+GuiService.MenuOpened:Connect(function()
+    wasVisibleBeforeEsc = mainFrame.Visible
+    mainFrame.Visible = false
+    openButton.Visible = false
+end)
+
+GuiService.MenuClosed:Connect(function()
+    if wasVisibleBeforeEsc then
+        mainFrame.Visible = true
+        openButton.Visible = false
+    else
+        openButton.Visible = true
+    end
+end)
+
+-- =====================================================================
+-- UI BUILDER (Toggles & Slider)
+-- =====================================================================
+local tabButtonsFrame = Instance.new("Frame")
+tabButtonsFrame.Size = UDim2.new(1, -30, 0, 35)
+tabButtonsFrame.Position = UDim2.new(0, 15, 0, 50)
+tabButtonsFrame.BackgroundTransparency = 1
+tabButtonsFrame.Parent = mainFrame
+
+local tabContentFrame = Instance.new("Frame")
+tabContentFrame.Size = UDim2.new(1, -30, 1, -100)
+tabContentFrame.Position = UDim2.new(0, 15, 0, 95)
+tabContentFrame.BackgroundTransparency = 1
+tabContentFrame.Parent = mainFrame
+
+local tabs = {}
+local tabNames = {"Main", "ESP", "Aimbot"}
+
+local function switchTab(tabName)
+    for name, content in pairs(tabs) do
+        content.Visible = (name == tabName)
+    end
+end
+
+for i, name in ipairs(tabNames) do
+    local tabBtn = Instance.new("TextButton")
+    tabBtn.Size = UDim2.new(0.32, 0, 1, 0)
+    tabBtn.Position = UDim2.new((i-1) * 0.34, 0, 0, 0)
+    tabBtn.BackgroundColor3 = Color3.fromRGB(65, 40, 90)
+    tabBtn.Text = name
+    tabBtn.TextColor3 = Color3.fromRGB(230, 200, 255)
+    tabBtn.TextSize = 13
+    tabBtn.Font = Enum.Font.GothamMedium
+    tabBtn.Parent = tabButtonsFrame
+    
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 6)
+    c.Parent = tabBtn
+    
+    local content = Instance.new("ScrollingFrame")
+    content.Size = UDim2.new(1, 0, 1, 0)
+    content.BackgroundTransparency = 1
+    content.BorderSizePixel = 0
+    content.CanvasSize = UDim2.new(0, 0, 0, 350)
+    content.ScrollBarThickness = 3
+    content.Visible = false
+    content.Parent = tabContentFrame
+    
+    tabs[name] = content
+    
+    tabBtn.MouseButton1Click:Connect(function()
+        switchTab(name)
+    end)
+    
+    if i == 1 then switchTab(name) end
+end
+
+local function createToggle(parentTab, name, posY, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 38)
+    btn.Position = UDim2.new(0, 0, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 36, 85)
+    btn.Text = "    " .. name
+    btn.TextColor3 = Color3.fromRGB(240, 220, 255)
+    btn.TextSize = 13
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.Parent = parentTab
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = btn
+    
+    local indicator = Instance.new("Frame")
+    indicator.Size = UDim2.new(0, 36, 0, 18)
+    indicator.Position = UDim2.new(1, -46, 0.5, -9)
+    indicator.BackgroundColor3 = Color3.fromRGB(90, 60, 120)
+    indicator.Parent = btn
+    
+    local indCorner = Instance.new("UICorner")
+    indCorner.CornerRadius = UDim.new(1, 0)
+    indCorner.Parent = indicator
+    
+    local circle = Instance.new("Frame")
+    circle.Size = UDim2.new(0, 14, 0, 14)
+    circle.Position = UDim2.new(0, 2, 0.5, -7)
+    circle.BackgroundColor3 = Color3.fromRGB(200, 180, 220)
+    circle.Parent = indicator
+    
+    local circCorner = Instance.new("UICorner")
+    circCorner.CornerRadius = UDim.new(1, 0)
+    circCorner.Parent = circle
+    
+    local state = false
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        if state then
+            circle:TweenPosition(UDim2.new(1, -16, 0.5, -7), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.15, true)
+            circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            indicator.BackgroundColor3 = Color3.fromRGB(220, 120, 240)
+        else
+            circle:TweenPosition(UDim2.new(0, 2, 0.5, -7), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.15, true)
+            circle.BackgroundColor3 = Color3.fromRGB(200, 180, 220)
+            indicator.BackgroundColor3 = Color3.fromRGB(90, 60, 120)
+        end
+        callback(state)
+    end)
+end
+
+local function createSlider(parentTab, name, posY, minVal, maxVal, defaultVal, callback)
+    local sliderFrame = Instance.new("Frame")
+    sliderFrame.Size = UDim2.new(1, 0, 0, 45)
+    sliderFrame.Position = UDim2.new(0, 0, 0, posY)
+    sliderFrame.BackgroundColor3 = Color3.fromRGB(60, 36, 85)
+    sliderFrame.Parent = parentTab
+
+    local sCorner = Instance.new("UICorner")
+    sCorner.CornerRadius = UDim.new(0, 6)
+    sCorner.Parent = sliderFrame
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 20)
+    label.Position = UDim2.new(0, 10, 0, 4)
+    label.BackgroundTransparency = 1
+    label.Text = name .. ": " .. defaultVal
+    label.TextColor3 = Color3.fromRGB(240, 220, 255)
+    label.TextSize = 12
+    label.Font = Enum.Font.GothamMedium
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = sliderFrame
+
+    local track = Instance.new("Frame")
+    track.Size = UDim2.new(1, -20, 0, 6)
+    track.Position = UDim2.new(0, 10, 0, 28)
+    track.BackgroundColor3 = Color3.fromRGB(90, 60, 120)
+    track.Parent = sliderFrame
+
+    local tCorner = Instance.new("UICorner")
+    tCorner.CornerRadius = UDim.new(1, 0)
+    tCorner.Parent = track
+
+    local fill = Instance.new("Frame")
+    fill.Size = UDim2.new((defaultVal - minVal) / (maxVal - minVal), 0, 1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(220, 120, 240)
+    fill.Parent = track
+
+    local fCorner = Instance.new("UICorner")
+    fCorner.CornerRadius = UDim.new(1, 0)
+    fCorner.Parent = fill
+
+    local dragging = false
+    local function update(input)
+        local pos = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+        local val = math.floor(minVal + (maxVal - minVal) * pos)
+        fill.Size = UDim2.new(pos, 0, 1, 0)
+        label.Text = name .. ": " .. val
+        callback(val)
+    end
+
+    track.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            update(input)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            update(input)
+        end
+    end)
+end
+
+-- =====================================================================
+-- 3. MAIN TAB
+-- =====================================================================
+local flying = false
+local flySpeed = 50
+local flyConnection
+local flyBodyVelocity
+local flyBodyGyro
+local savedAutoRotate = true
+
+local function cleanupFly()
+    if flyConnection then
+        flyConnection:Disconnect()
+        flyConnection = nil
+    end
+    if flyBodyVelocity then
+        flyBodyVelocity:Destroy()
+        flyBodyVelocity = nil
+    end
+    if flyBodyGyro then
+        flyBodyGyro:Destroy()
+        flyBodyGyro = nil
+    end
+    local char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.AutoRotate = savedAutoRotate
+        hum.PlatformStand = false
+    end
+end
+
+local function startFly()
+    cleanupFly()
+    local char = LocalPlayer.Character
+    if not char then return end
+
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not root or not hum then return end
+
+    savedAutoRotate = hum.AutoRotate
+    hum.AutoRotate = false
+
+    flyBodyVelocity = Instance.new("LinearVelocity")
+    flyBodyVelocity.Name = "Client67FlyVelocity"
+    local attachment = Instance.new("Attachment", root)
+    flyBodyVelocity.Attachment0 = attachment
+    flyBodyVelocity.MaxForce = math.huge
+    flyBodyVelocity.VectorVelocity = Vector3.zero
+    flyBodyVelocity.Parent = root
+
+    flyBodyGyro = Instance.new("AlignOrientation")
+    flyBodyGyro.Name = "Client67FlyGyro"
+    flyBodyGyro.Attachment0 = attachment
+    flyBodyGyro.MaxTorque = math.huge
+    flyBodyGyro.Responsiveness = 200
+    flyBodyGyro.Parent = root
+
+    flyConnection = RunService.RenderStepped:Connect(function()
+        if not flying then return end
+        local currentChar = LocalPlayer.Character
+        local currentRoot = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
+        if not currentRoot then return end
+
+        local camCF = Camera.CFrame
+        local move = Vector3.zero
+
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then move += camCF.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then move -= camCF.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then move -= camCF.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then move += camCF.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then move += Vector3.yAxis end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then move -= Vector3.yAxis end
+
+        if move.Magnitude > 0 then move = move.Unit end
+        flyBodyVelocity.VectorVelocity = move * flySpeed
+        flyBodyGyro.CFrame = camCF
+    end)
+end
+
+createToggle(tabs["Main"], "Fly", 0, function(state)
+    flying = state
+    if flying then startFly() else cleanupFly() end
+end)
+
+createSlider(tabs["Main"], "Fly Speed", 45, 10, 200, flySpeed, function(val)
+    flySpeed = val
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(0.25)
+    if flying then startFly() end
+end)
+
+local noclipEnabled = false
+local noclipConnection
+createToggle(tabs["Main"], "Noclip", 95, function(state)
+    noclipEnabled = state
+    if noclipConnection then noclipConnection:Disconnect() end
+    if noclipEnabled then
+        noclipConnection = RunService.Stepped:Connect(function()
+            local char = LocalPlayer.Character
+            if char then
+                for _, part in pairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- =====================================================================
+-- 4. ESP TAB (Kompakterer 3D-Kopfkreis + Skeleton)
+-- =====================================================================
+local espBox = false
+local espSnaplines = false
+local espNames = false
+local espDistance = false
+local espSkeleton = false
+local currentThemeColor = Color3.fromRGB(220, 120, 240)
+
+local colorContainer = Instance.new("Frame")
+colorContainer.Size = UDim2.new(1, 0, 0, 26)
+colorContainer.Position = UDim2.new(0, 0, 0, 0)
+colorContainer.BackgroundTransparency = 1
+colorContainer.Parent = tabs["ESP"]
+
+local colors = {
+    {Name = "Lila", Color = Color3.fromRGB(220, 120, 240)},
+    {Name = "Pink", Color = Color3.fromRGB(255, 105, 180)},
+    {Name = "Weiß", Color = Color3.fromRGB(255, 255, 255)},
+    {Name = "Rot", Color = Color3.fromRGB(255, 50, 50)},
+    {Name = "Blau", Color = Color3.fromRGB(50, 150, 255)},
+    {Name = "Grün", Color = Color3.fromRGB(50, 255, 50)}
+}
+
+for i, colData in ipairs(colors) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.15, -2, 1, 0)
+    btn.Position = UDim2.new((i-1) * 0.168, 0, 0, 0)
+    btn.BackgroundColor3 = colData.Color
+    btn.Text = ""
+    btn.Parent = colorContainer
+    
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 4)
+    c.Parent = btn
+    
+    btn.MouseButton1Click:Connect(function()
+        currentThemeColor = colData.Color
+    end)
+end
+
+createToggle(tabs["ESP"], "ESP Box", 36, function(state) espBox = state end)
+createToggle(tabs["ESP"], "ESP Snaplines", 78, function(state) espSnaplines = state end)
+createToggle(tabs["ESP"], "ESP Names", 120, function(state) espNames = state end)
+createToggle(tabs["ESP"], "ESP Distance", 162, function(state) espDistance = state end)
+createToggle(tabs["ESP"], "ESP Skeleton", 204, function(state) espSkeleton = state end)
+
+local espCache = {}
+local SKELETON_LINE_COUNT = 14
+
+local function hidePlayerEsp(cache)
+    cache.Box.Visible = false
+    cache.Name.Visible = false
+    cache.Distance.Visible = false
+    cache.Snapline.Visible = false
+    cache.HeadCircle.Visible = false
+    for _, line in ipairs(cache.SkeletonLines) do
+        line.Visible = false
+    end
+end
+
+local function removeEspForPlayer(p)
+    if espCache[p] then
+        pcall(function()
+            espCache[p].Box:Remove()
+            espCache[p].Name:Remove()
+            espCache[p].Distance:Remove()
+            espCache[p].Snapline:Remove()
+            espCache[p].HeadCircle:Remove()
+            for _, line in ipairs(espCache[p].SkeletonLines) do
+                line:Remove()
+            end
+        end)
+        espCache[p] = nil
+    end
+end
+
+Players.PlayerRemoving:Connect(removeEspForPlayer)
+
+RunService.RenderStepped:Connect(function()
+    local vpSize = Camera.ViewportSize
+    local camPos = Camera.CFrame.Position
+    local anyEspActive = (espBox or espSnaplines or espNames or espDistance or espSkeleton)
+
+    for p, cache in pairs(espCache) do
+        if not p.Parent or not anyEspActive then
+            hidePlayerEsp(cache)
+        end
+    end
+
+    if not anyEspActive then return end
+
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then
+            local char = p.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+            if char and hum and hrp and hum.Health > 0 then
+                if not espCache[p] then
+                    local skelLines = {}
+                    for i = 1, SKELETON_LINE_COUNT do
+                        local l = Drawing.new("Line")
+                        l.Thickness = 1.3
+                        table.insert(skelLines, l)
+                    end
+
+                    espCache[p] = {
+                        Box = Drawing.new("Square"),
+                        Name = Drawing.new("Text"),
+                        Distance = Drawing.new("Text"),
+                        Snapline = Drawing.new("Line"),
+                        HeadCircle = Drawing.new("Circle"),
+                        SkeletonLines = skelLines
+                    }
+                    espCache[p].Box.Thickness = 1.4
+                    espCache[p].Box.Filled = false
+                    espCache[p].Name.Size = 13
+                    espCache[p].Name.Center = true
+                    espCache[p].Name.Outline = true
+                    espCache[p].Distance.Size = 11
+                    espCache[p].Distance.Center = true
+                    espCache[p].Distance.Outline = true
+                    espCache[p].Snapline.Thickness = 1.5
+                    
+                    espCache[p].HeadCircle.Thickness = 1.3
+                    espCache[p].HeadCircle.Filled = false
+                    espCache[p].HeadCircle.NumSides = 18
+                end
+
+                local cache = espCache[p]
+                local rootPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+
+                if onScreen then
+                    local topPart = char:FindFirstChild("Head") or hrp
+                    local bottomPart = char:FindFirstChild("LeftFoot") or char:FindFirstChild("RightFoot") or char:FindFirstChild("Left Leg") or hrp
+
+                    local topPos = Camera:WorldToViewportPoint(topPart.Position + Vector3.new(0, 1.1, 0))
+                    local botPos = Camera:WorldToViewportPoint(bottomPart.Position - Vector3.new(0, 1.1, 0))
+
+                    local height = math.abs(topPos.Y - botPos.Y)
+                    local width = height * 0.65
+
+                    if espBox then
+                        cache.Box.Visible = true
+                        cache.Box.Size = Vector2.new(width, height)
+                        cache.Box.Position = Vector2.new(rootPos.X - width / 2, topPos.Y)
+                        cache.Box.Color = currentThemeColor
+                    else
+                        cache.Box.Visible = false
+                    end
+
+                    if espNames then
+                        cache.Name.Visible = true
+                        cache.Name.Text = p.Name
+                        cache.Name.Position = Vector2.new(rootPos.X, topPos.Y - 16)
+                        cache.Name.Color = currentThemeColor
+                    else
+                        cache.Name.Visible = false
+                    end
+
+                    if espDistance then
+                        local dist = (camPos - hrp.Position).Magnitude
+                        cache.Distance.Visible = true
+                        cache.Distance.Text = math.floor(dist) .. "m"
+                        cache.Distance.Position = Vector2.new(rootPos.X, topPos.Y - 28)
+                        cache.Distance.Color = currentThemeColor
+                    else
+                        cache.Distance.Visible = false
+                    end
+
+                    if espSnaplines then
+                        cache.Snapline.Visible = true
+                        cache.Snapline.From = Vector2.new(vpSize.X / 2, 0)
+                        cache.Snapline.To = Vector2.new(rootPos.X, topPos.Y)
+                        cache.Snapline.Color = currentThemeColor
+                    else
+                        cache.Snapline.Visible = false
+                    end
+
+                    if espSkeleton then
+                        local positions = {}
+                        
+                        if char:FindFirstChild("UpperTorso") then
+                            local function getPos(name) local part = char:FindFirstChild(name) return part and part.Position end
+                            positions = {
+                                Head = getPos("Head"), Neck = getPos("UpperTorso"), Pelvis = getPos("LowerTorso"),
+                                LShoulder = getPos("LeftUpperArm"), LElbow = getPos("LeftLowerArm"), LHand = getPos("LeftHand"),
+                                RShoulder = getPos("RightUpperArm"), RElbow = getPos("RightLowerArm"), RHand = getPos("RightHand"),
+                                LHip = getPos("LeftUpperLeg"), LKnee = getPos("LeftLowerLeg"), LFoot = getPos("LeftFoot"),
+                                RHip = getPos("RightUpperLeg"), RKnee = getPos("RightLowerLeg"), RFoot = getPos("RightFoot")
+                            }
+                        elseif char:FindFirstChild("Torso") then
+                            local t = char:FindFirstChild("Torso")
+                            local la = char:FindFirstChild("Left Arm")
+                            local ra = char:FindFirstChild("Right Arm")
+                            local ll = char:FindFirstChild("Left Leg")
+                            local rl = char:FindFirstChild("Right Leg")
+                            local h = char:FindFirstChild("Head")
+
+                            positions.Head = h and h.Position
+                            if t then
+                                positions.Neck = (t.CFrame * CFrame.new(0, 0.8, 0)).Position
+                                positions.Pelvis = (t.CFrame * CFrame.new(0, -0.8, 0)).Position
+                            end
+                            if la then
+                                positions.LShoulder = (la.CFrame * CFrame.new(0, 0.8, 0)).Position
+                                positions.LElbow = la.Position
+                                positions.LHand = (la.CFrame * CFrame.new(0, -0.8, 0)).Position
+                            end
+                            if ra then
+                                positions.RShoulder = (ra.CFrame * CFrame.new(0, 0.8, 0)).Position
+                                positions.RElbow = ra.Position
+                                positions.RHand = (ra.CFrame * CFrame.new(0, -0.8, 0)).Position
+                            end
+                            if ll then
+                                positions.LHip = (ll.CFrame * CFrame.new(0, 0.8, 0)).Position
+                                positions.LKnee = ll.Position
+                                positions.LFoot = (ll.CFrame * CFrame.new(0, -0.8, 0)).Position
+                            end
+                            if rl then
+                                positions.RHip = (rl.CFrame * CFrame.new(0, 0.8, 0)).Position
+                                positions.RKnee = rl.Position
+                                positions.RFoot = (rl.CFrame * CFrame.new(0, -0.8, 0)).Position
+                            end
+                        end
+
+                        -- Kompakterer Kopf-Kreis (auf 0.45 Studs reduziert)
+                        if positions.Head then
+                            local headPos, headOnScreen = Camera:WorldToViewportPoint(positions.Head)
+                            local headTopPos = Camera:WorldToViewportPoint(positions.Head + Vector3.new(0, 0.45, 0))
+                            
+                            if headOnScreen then
+                                local dynamicRadius = (Vector2.new(headPos.X, headPos.Y) - Vector2.new(headTopPos.X, headTopPos.Y)).Magnitude
+                                cache.HeadCircle.Visible = true
+                                cache.HeadCircle.Position = Vector2.new(headPos.X, headPos.Y)
+                                cache.HeadCircle.Color = currentThemeColor
+                                cache.HeadCircle.Radius = math.clamp(dynamicRadius, 1.5, 60)
+                            else
+                                cache.HeadCircle.Visible = false
+                            end
+                        else
+                            cache.HeadCircle.Visible = false
+                        end
+
+                        local connectionMap = {
+                            {"Head", "Neck"}, {"Neck", "Pelvis"},
+                            {"Neck", "LShoulder"}, {"LShoulder", "LElbow"}, {"LElbow", "LHand"},
+                            {"Neck", "RShoulder"}, {"RShoulder", "RElbow"}, {"RElbow", "RHand"},
+                            {"Pelvis", "LHip"}, {"LHip", "LKnee"}, {"LKnee", "LFoot"},
+                            {"Pelvis", "RHip"}, {"RHip", "RKnee"}, {"RKnee", "RFoot"}
+                        }
+
+                        for idx, lineObj in ipairs(cache.SkeletonLines) do
+                            local conn = connectionMap[idx]
+                            if conn and positions[conn[1]] and positions[conn[2]] then
+                                local posA, onA = Camera:WorldToViewportPoint(positions[conn[1]])
+                                local posB, onB = Camera:WorldToViewportPoint(positions[conn[2]])
+                                
+                                if onA or onB then
+                                    lineObj.Visible = true
+                                    lineObj.From = Vector2.new(posA.X, posA.Y)
+                                    lineObj.To = Vector2.new(posB.X, posB.Y)
+                                    lineObj.Color = currentThemeColor
+                                else
+                                    lineObj.Visible = false
+                                end
+                            else
+                                lineObj.Visible = false
+                            end
+                        end
+                    else
+                        cache.HeadCircle.Visible = false
+                        for _, lineObj in ipairs(cache.SkeletonLines) do
+                            lineObj.Visible = false
+                        end
+                    end
+
+                else
+                    hidePlayerEsp(cache)
+                end
+            else
+                if espCache[p] then
+                    hidePlayerEsp(espCache[p])
+                end
+            end
+        end
+    end
+end)
+
+-- =====================================================================
+-- 5. AIMBOT TAB
+-- =====================================================================
+local aimbotPCEnabled = false
+local aimbotMobileEnabled = false
+local aimFOV = 130
+
+local fovCircle = Drawing.new("Circle")
+fovCircle.Visible = false
+fovCircle.Radius = aimFOV
+fovCircle.Filled = false
+fovCircle.Thickness = 1.2
+fovCircle.Color = Color3.fromRGB(220, 120, 240)
+
+local function updateFovVisibility()
+    fovCircle.Visible = aimbotPCEnabled or aimbotMobileEnabled
+end
+
+createToggle(tabs["Aimbot"], "Aimbot PC", 0, function(state)
+    aimbotPCEnabled = state
+    updateFovVisibility()
+end)
+
+createToggle(tabs["Aimbot"], "Aimbot Mobile", 45, function(state)
+    aimbotMobileEnabled = state
+    updateFovVisibility()
+end)
+
+createSlider(tabs["Aimbot"], "FOV Größe", 90, 30, 500, aimFOV, function(val)
+    aimFOV = val
+    fovCircle.Radius = val
+end)
+
+local function getClosestPlayerInFOV()
+    local closestTarget = nil
+    local shortestFovDist = aimFOV
+    
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("Head") and p.Character:FindFirstChildOfClass("Humanoid") then
+            if p.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+                local head = p.Character.Head
+                local screenPoint, onScreen = Camera:WorldToViewportPoint(head.Position)
+                
+                if onScreen then
+                    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                    local fovDist = (Vector2.new(screenPoint.X, screenPoint.Y) - screenCenter).Magnitude
+                    
+                    if fovDist < shortestFovDist then
+                        shortestFovDist = fovDist
+                        closestTarget = head
+                    end
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+local lockedTarget = nil
+
+RunService.RenderStepped:Connect(function()
+    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    fovCircle.Position = screenCenter
+    
+    if not aimbotPCEnabled and not aimbotMobileEnabled then return end
+    
+    if aimbotPCEnabled then
+        local rmbHeld = UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
+        if rmbHeld then
+            if not lockedTarget or not lockedTarget.Parent or not lockedTarget.Parent:FindFirstChildOfClass("Humanoid") or lockedTarget.Parent:FindFirstChildOfClass("Humanoid").Health <= 0 then
+                lockedTarget = getClosestPlayerInFOV()
+            end
+            if lockedTarget then
+                Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lockedTarget.Position)
+                return
+            end
+        else
+            lockedTarget = nil
+        end
+    end
+
+    if aimbotMobileEnabled then
+        local target = getClosestPlayerInFOV()
+        if target then
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
+        end
+    end
+end)
+
+StarterGui:SetCore("SendNotification", {
+    Title = "67 Client",
+    Text = "Kopfkreis-Größe verkleinert!",
+    Duration = 4
+})
